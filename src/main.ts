@@ -29,7 +29,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Bank Sampah API')
     .setDescription(
-      'RESTful API Sistem Bank Sampah Digital sesuai kebutuhan UKK RPL.',
+      'RESTful API Sistem Bank Sampah Digital.',
     )
     .setVersion('1.0')
     .addBearerAuth(
