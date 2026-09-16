@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "app_maker" ADD COLUMN     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

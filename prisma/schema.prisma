@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  admin_bank
+  nasabah
+}
+
+enum JenisSampah {
+  plastik
+  kertas
+  logam
+  kaca
+}
+
+enum StatusSetor {
+  menunggu_konfirmasi
+  diverifikasi
+  selesai
+  ditolak
+}
+
+enum StatusPenukaran {
+  diproses
+  selesai
+}
+
+model User {
+  id       String @id @default(uuid()) @db.Uuid
+  username String @unique @db.VarChar(50)
+  password String @db.VarChar(255)
+  role     Role
+
+  nasabah   Nasabah?
+  adminBank AdminBank?
+
+  @@map("users")
+}
+
+model Nasabah {
+  id           String    @id @default(uuid()) @db.Uuid
+  namaNasabah  String    @map("nama_nasabah") @db.VarChar(100)
+  alamat       String
+  telp         String    @db.VarChar(20)
+  saldoPoin    Float     @default(0) @map("saldo_poin")
+  idUser       String    @unique @map("id_user") @db.Uuid
+  foto         String?   @db.VarChar(255)
+  tanggalLahir DateTime? @map("tanggal_lahir")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  user          User            @relation(fields: [idUser], references: [id])
+  setorSampah   SetorSampah[]
+  penukaranPoin PenukaranPoin[]
+
+  @@map("nasabah")
+}
+
+model AdminBank {
+  id            String @id @default(uuid()) @db.Uuid
+  namaUnit      String @map("nama_unit") @db.VarChar(100)
+  namaPengelola String @map("nama_pengelola") @db.VarChar(100)
+  telp          String @db.VarChar(20)
+  idUser        String @unique @map("id_user") @db.Uuid
+
+  user        User          @relation(fields: [idUser], references: [id])
+  setorSampah SetorSampah[]
+
+  @@map("admin_bank")
+}
+
+model KategoriSampah {
+  id           String      @id @default(uuid()) @db.Uuid
+  namaKategori String      @map("nama_kategori") @db.VarChar(100)
+  hargaPerKg   Float       @map("harga_per_kg")
+  poinPerKg    Float       @map("poin_per_kg")
+  jenis        JenisSampah
+  foto         String?     @db.VarChar(255)
+
+  detailSetor DetailSetor[]
+
+  @@map("kategori_sampah")
+}
+
+model SetorSampah {
+  id           String      @id @default(uuid()) @db.Uuid
+  kodeSetor    String      @unique @map("kode_setor") @db.VarChar(30)
+  tanggal      DateTime
+  idAdmin      String?     @map("id_admin") @db.Uuid
+  idNasabah    String      @map("id_nasabah") @db.Uuid
+  status       StatusSetor @default(menunggu_konfirmasi)
+  totalBeratKg Float       @map("total_berat_kg")
+  totalPoin    Float       @map("total_poin")
+  catatan      String?
+  catatanAdmin String?     @map("catatan_admin")
+
+  adminBank AdminBank? @relation(fields: [idAdmin], references: [id])
+  nasabah   Nasabah    @relation(fields: [idNasabah], references: [id])
+
+  detailSetor   DetailSetor[]
+  penukaranPoin PenukaranPoin[]
+
+  @@map("setor_sampah")
+}
+
+model DetailSetor {
+  id               String @id @default(uuid()) @db.Uuid
+  idSetor          String @map("id_setor") @db.Uuid
+  idKategoriSampah String @map("id_kategori_sampah") @db.Uuid
+  beratKg          Float  @map("berat_kg")
+  subtotalPoin     Float  @map("subtotal_poin")
+
+  kategoriSampah KategoriSampah @relation(fields: [idKategoriSampah], references: [id])
+  setorSampah    SetorSampah    @relation(fields: [idSetor], references: [id], onDelete: Cascade)
+
+  @@map("detail_setor")
+}
+
+model Hadiah {
+  id             String  @id @default(uuid()) @db.Uuid
+  namaHadiah     String  @map("nama_hadiah") @db.VarChar(100)
+  poinDibutuhkan Float   @map("poin_dibutuhkan")
+  stok           Int
+  foto           String? @db.VarChar(255)
+
+  penukaranPoin PenukaranPoin[]
+
+  @@map("hadiah")
+}
+
+model PenukaranPoin {
+  id            String          @id @default(uuid()) @db.Uuid
+  kodePenukaran String          @unique @map("kode_penukaran") @db.VarChar(30)
+  tanggal       DateTime        @default(now())
+  idNasabah     String          @map("id_nasabah") @db.Uuid
+  idHadiah      String          @map("id_hadiah") @db.Uuid
+  idSetor       String?         @map("id_setor") @db.Uuid
+  poinTerpakai  Float           @map("poin_terpakai")
+  status        StatusPenukaran @default(diproses)
+
+  nasabah     Nasabah      @relation(fields: [idNasabah], references: [id])
+  hadiah      Hadiah       @relation(fields: [idHadiah], references: [id])
+  setorSampah SetorSampah? @relation(fields: [idSetor], references: [id])
+
+  @@map("penukaran_poin")
+}
