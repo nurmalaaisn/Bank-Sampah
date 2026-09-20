@@ -16,8 +16,8 @@ import {
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
+
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 
 import { AuthService } from './auth.service';
 import { RegisterNasabahDto } from './dto/register-nasabah.dto';
@@ -66,7 +66,8 @@ export class AuthController {
                 },
                 alamat: {
                     type: 'string',
-                    example: 'Jl. Mawar No. 10, Malang',
+                    example:
+                        'Jl. Mawar No. 10, Malang',
                 },
                 telp: {
                     type: 'string',
@@ -75,48 +76,53 @@ export class AuthController {
                 foto: {
                     type: 'string',
                     format: 'binary',
-                    description: 'Foto nasabah',
+                    description:
+                        'Foto nasabah yang akan disimpan di Cloudinary',
                 },
             },
         },
     })
     @ApiResponse({
         status: 201,
-        description: 'Registrasi nasabah berhasil',
+        description:
+            'Registrasi nasabah berhasil',
     })
     @ApiResponse({
         status: 400,
-        description: 'Data registrasi tidak valid / username sudah digunakan',
+        description:
+            'Data registrasi tidak valid / username sudah digunakan',
     })
-    @ResponseMessage('Registrasi nasabah berhasil')
+    @ResponseMessage(
+        'Registrasi nasabah berhasil',
+    )
     @UseInterceptors(
-        FileInterceptor('foto', {
-            storage: diskStorage({
-                destination: './uploads',
-            }),
-        }),
+        FileInterceptor('foto'),
     )
     registerNasabah(
         @Body() dto: RegisterNasabahDto,
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile()
+        file: Express.Multer.File,
     ) {
         return this.authService.registerNasabah(
             dto,
-            file?.filename,
+            file,
         );
     }
 
     @Post('admin/register')
     @ApiOperation({
-        summary: 'Registrasi unit Bank Sampah',
+        summary:
+            'Registrasi unit Bank Sampah',
     })
     @ApiResponse({
         status: 201,
-        description: 'Pendaftaran unit Bank Sampah berhasil',
+        description:
+            'Pendaftaran unit Bank Sampah berhasil',
     })
     @ApiResponse({
         status: 400,
-        description: 'Data registrasi tidak valid',
+        description:
+            'Data registrasi tidak valid',
     })
     @ResponseMessage(
         'Pendaftaran unit Bank Sampah berhasil',
@@ -124,7 +130,9 @@ export class AuthController {
     registerAdmin(
         @Body() dto: RegisterAdminDto,
     ) {
-        return this.authService.registerAdmin(dto);
+        return this.authService.registerAdmin(
+            dto,
+        );
     }
 
     @Post('login')
@@ -137,9 +145,12 @@ export class AuthController {
     })
     @ApiResponse({
         status: 401,
-        description: 'Username atau password salah',
+        description:
+            'Username atau password salah',
     })
-    @UseInterceptors(LoginResponseInterceptor)
+    @UseInterceptors(
+        LoginResponseInterceptor,
+    )
     login(
         @Body() dto: LoginUserDto,
     ) {
@@ -149,15 +160,18 @@ export class AuthController {
     @Get('me')
     @ApiBearerAuth('access-token')
     @ApiOperation({
-        summary: 'Mengambil profile user yang sedang login',
+        summary:
+            'Mengambil profile user yang sedang login',
     })
     @ApiResponse({
         status: 200,
-        description: 'Data profile user berhasil diambil',
+        description:
+            'Data profile user berhasil diambil',
     })
     @ApiResponse({
         status: 401,
-        description: 'Token tidak valid atau tidak ada',
+        description:
+            'Token tidak valid atau tidak ada',
     })
     @ResponseMessage(
         'Data profile user berhasil diambil',
@@ -170,6 +184,8 @@ export class AuthController {
             role: 'admin_bank' | 'nasabah';
         },
     ) {
-        return this.authService.getMe(user.userId);
+        return this.authService.getMe(
+            user.userId,
+        );
     }
 }

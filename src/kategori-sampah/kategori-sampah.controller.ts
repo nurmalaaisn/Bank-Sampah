@@ -22,7 +22,6 @@ import {
 } from '@nestjs/swagger';
 
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 
 import { KategoriSampahService } from './kategori-sampah.service';
 import { CreateKategoriSampahDto } from './dto/create-kategori-sampah.dto';
@@ -38,7 +37,7 @@ import { ResponseMessage } from '../common/decorators/response-message.decorator
 export class KategoriSampahController {
     constructor(
         private readonly kategoriSampahService: KategoriSampahService,
-    ) { }
+    ) {}
 
     @Get()
     @ApiOperation({
@@ -118,7 +117,8 @@ export class KategoriSampahController {
                 foto: {
                     type: 'string',
                     format: 'binary',
-                    description: 'Foto kategori sampah',
+                    description:
+                        'Foto kategori sampah yang akan disimpan di Cloudinary',
                 },
             },
         },
@@ -149,11 +149,7 @@ export class KategoriSampahController {
         'Kategori sampah baru berhasil disimpan',
     )
     @UseInterceptors(
-        FileInterceptor('foto', {
-            storage: diskStorage({
-                destination: './uploads',
-            }),
-        }),
+        FileInterceptor('foto'),
     )
     create(
         @Body() dto: CreateKategoriSampahDto,
@@ -162,7 +158,7 @@ export class KategoriSampahController {
     ) {
         return this.kategoriSampahService.create(
             dto,
-            file?.filename,
+            file,
         );
     }
 
@@ -204,7 +200,8 @@ export class KategoriSampahController {
                 foto: {
                     type: 'string',
                     format: 'binary',
-                    description: 'Foto kategori sampah',
+                    description:
+                        'Foto kategori sampah baru yang akan disimpan di Cloudinary',
                 },
             },
         },
@@ -239,11 +236,7 @@ export class KategoriSampahController {
         'Kategori sampah berhasil diperbarui',
     )
     @UseInterceptors(
-        FileInterceptor('foto', {
-            storage: diskStorage({
-                destination: './uploads',
-            }),
-        }),
+        FileInterceptor('foto'),
     )
     update(
         @Param('id') id: string,
@@ -254,7 +247,7 @@ export class KategoriSampahController {
         return this.kategoriSampahService.update(
             id,
             dto,
-            file?.filename,
+            file,
         );
     }
 

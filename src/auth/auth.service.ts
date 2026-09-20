@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { CloudinaryService } from '../common/cloudinary/cloudinary.service';
 
 import { RegisterNasabahDto } from './dto/register-nasabah.dto';
 import { RegisterAdminDto } from './dto/register-admin.dto';
@@ -17,11 +18,12 @@ export class AuthService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
+        private readonly cloudinaryService: CloudinaryService,
     ) {}
 
     async registerNasabah(
         dto: RegisterNasabahDto,
-        foto?: string,
+        file?: Express.Multer.File,
     ) {
         const existingUser =
             await this.prisma.user.findUnique({
@@ -38,6 +40,18 @@ export class AuthService {
 
         const hashedPassword =
             await bcrypt.hash(dto.password, 10);
+
+        let foto: string | null = null;
+
+        if (file) {
+            const uploaded =
+                await this.cloudinaryService.uploadImage(
+                    file,
+                    'bank-sampah/nasabah',
+                );
+
+            foto = uploaded.secure_url;
+        }
 
         const user =
             await this.prisma.$transaction(

@@ -5,6 +5,8 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { CloudinaryService } from '../common/cloudinary/cloudinary.service';
+
 import { CreateHadiahDto } from './dto/create-hadiah.dto';
 import { UpdateHadiahDto } from './dto/update-hadiah.dto';
 
@@ -12,6 +14,7 @@ import { UpdateHadiahDto } from './dto/update-hadiah.dto';
 export class HadiahService {
     constructor(
         private readonly prisma: PrismaService,
+        private readonly cloudinaryService: CloudinaryService,
     ) {}
 
     private isValidUuid(id: string): boolean {
@@ -30,12 +33,13 @@ export class HadiahService {
 
     async create(
         dto: CreateHadiahDto,
-        foto?: string,
+        file?: Express.Multer.File,
     ) {
         const existing =
             await this.prisma.hadiah.findFirst({
                 where: {
-                    namaHadiah: dto.namaHadiah,
+                    namaHadiah:
+                        dto.namaHadiah,
                 },
             });
 
@@ -45,9 +49,22 @@ export class HadiahService {
             );
         }
 
+        let foto: string | null = null;
+
+        if (file) {
+            const uploaded =
+                await this.cloudinaryService.uploadImage(
+                    file,
+                    'bank-sampah/hadiah',
+                );
+
+            foto = uploaded.secure_url;
+        }
+
         return this.prisma.hadiah.create({
             data: {
-                namaHadiah: dto.namaHadiah,
+                namaHadiah:
+                    dto.namaHadiah,
                 poinDibutuhkan:
                     dto.poinDibutuhkan,
                 stok: dto.stok,
@@ -82,7 +99,7 @@ export class HadiahService {
     async update(
         id: string,
         dto: UpdateHadiahDto,
-        foto?: string,
+        file?: Express.Multer.File,
     ) {
         const existing =
             await this.findOne(id);
@@ -90,7 +107,8 @@ export class HadiahService {
         const duplicate =
             await this.prisma.hadiah.findFirst({
                 where: {
-                    namaHadiah: dto.namaHadiah,
+                    namaHadiah:
+                        dto.namaHadiah,
                     NOT: {
                         id: existing.id,
                     },
@@ -101,6 +119,19 @@ export class HadiahService {
             throw new BadRequestException(
                 'data sudah ada',
             );
+        }
+
+        let foto: string | undefined =
+            undefined;
+
+        if (file) {
+            const uploaded =
+                await this.cloudinaryService.uploadImage(
+                    file,
+                    'bank-sampah/hadiah',
+                );
+
+            foto = uploaded.secure_url;
         }
 
         const updated =

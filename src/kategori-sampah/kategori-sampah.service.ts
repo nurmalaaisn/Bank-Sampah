@@ -3,13 +3,19 @@ import {
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service';
+import { CloudinaryService } from '../common/cloudinary/cloudinary.service';
+
 import { CreateKategoriSampahDto } from './dto/create-kategori-sampah.dto';
 import { UpdateKategoriSampahDto } from './dto/update-kategori-sampah.dto';
 
 @Injectable()
 export class KategoriSampahService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly cloudinaryService: CloudinaryService,
+    ) { }
 
     private isValidUuid(id: string): boolean {
         return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -37,25 +43,43 @@ export class KategoriSampahService {
 
     async create(
         dto: CreateKategoriSampahDto,
-        foto?: string,
+        file?: Express.Multer.File,
     ) {
         const existing =
             await this.prisma.kategoriSampah.findFirst({
                 where: {
-                    namaKategori: dto.namaKategori,
+                    namaKategori:
+                        dto.namaKategori,
                 },
             });
 
         if (existing) {
-            throw new BadRequestException('data sudah ada');
+            throw new BadRequestException(
+                'data sudah ada',
+            );
+        }
+
+        let foto: string | null = null;
+
+        if (file) {
+            const uploaded =
+                await this.cloudinaryService.uploadImage(
+                    file,
+                    'bank-sampah/kategori-sampah',
+                );
+
+            foto = uploaded.secure_url;
         }
 
         const kategori =
             await this.prisma.kategoriSampah.create({
                 data: {
-                    namaKategori: dto.namaKategori,
-                    hargaPerKg: dto.hargaPerKg,
-                    poinPerKg: dto.poinPerKg,
+                    namaKategori:
+                        dto.namaKategori,
+                    hargaPerKg:
+                        dto.hargaPerKg,
+                    poinPerKg:
+                        dto.poinPerKg,
                     jenis: dto.jenis as
                         | 'plastik'
                         | 'kertas'
@@ -67,9 +91,12 @@ export class KategoriSampahService {
 
         return {
             id: kategori.id,
-            namaKategori: kategori.namaKategori,
-            hargaPerKg: kategori.hargaPerKg,
-            poinPerKg: kategori.poinPerKg,
+            namaKategori:
+                kategori.namaKategori,
+            hargaPerKg:
+                kategori.hargaPerKg,
+            poinPerKg:
+                kategori.poinPerKg,
             jenis: kategori.jenis,
             foto: kategori.foto,
         };
@@ -77,7 +104,9 @@ export class KategoriSampahService {
 
     async findOne(id: string) {
         if (!this.isValidUuid(id)) {
-            throw new NotFoundException('data tidak ada');
+            throw new NotFoundException(
+                'data tidak ada',
+            );
         }
 
         const kategori =
@@ -88,14 +117,19 @@ export class KategoriSampahService {
             });
 
         if (!kategori) {
-            throw new NotFoundException('data tidak ada');
+            throw new NotFoundException(
+                'data tidak ada',
+            );
         }
 
         return {
             id: kategori.id,
-            namaKategori: kategori.namaKategori,
-            hargaPerKg: kategori.hargaPerKg,
-            poinPerKg: kategori.poinPerKg,
+            namaKategori:
+                kategori.namaKategori,
+            hargaPerKg:
+                kategori.hargaPerKg,
+            poinPerKg:
+                kategori.poinPerKg,
             jenis: kategori.jenis,
             foto: kategori.foto,
         };
@@ -104,10 +138,12 @@ export class KategoriSampahService {
     async update(
         id: string,
         dto: UpdateKategoriSampahDto,
-        foto?: string,
+        file?: Express.Multer.File,
     ) {
         if (!this.isValidUuid(id)) {
-            throw new NotFoundException('data tidak ada');
+            throw new NotFoundException(
+                'data tidak ada',
+            );
         }
 
         const existing =
@@ -118,13 +154,16 @@ export class KategoriSampahService {
             });
 
         if (!existing) {
-            throw new NotFoundException('data tidak ada');
+            throw new NotFoundException(
+                'data tidak ada',
+            );
         }
 
         const duplicate =
             await this.prisma.kategoriSampah.findFirst({
                 where: {
-                    namaKategori: dto.namaKategori,
+                    namaKategori:
+                        dto.namaKategori,
                     NOT: {
                         id,
                     },
@@ -132,7 +171,22 @@ export class KategoriSampahService {
             });
 
         if (duplicate) {
-            throw new BadRequestException('data sudah ada');
+            throw new BadRequestException(
+                'data sudah ada',
+            );
+        }
+
+        let foto: string | undefined =
+            undefined;
+
+        if (file) {
+            const uploaded =
+                await this.cloudinaryService.uploadImage(
+                    file,
+                    'bank-sampah/kategori-sampah',
+                );
+
+            foto = uploaded.secure_url;
         }
 
         const kategori =
@@ -141,9 +195,12 @@ export class KategoriSampahService {
                     id,
                 },
                 data: {
-                    namaKategori: dto.namaKategori,
-                    hargaPerKg: dto.hargaPerKg,
-                    poinPerKg: dto.poinPerKg,
+                    namaKategori:
+                        dto.namaKategori,
+                    hargaPerKg:
+                        dto.hargaPerKg,
+                    poinPerKg:
+                        dto.poinPerKg,
                     jenis: dto.jenis as
                         | 'plastik'
                         | 'kertas'
@@ -157,9 +214,12 @@ export class KategoriSampahService {
 
         return {
             id: kategori.id,
-            namaKategori: kategori.namaKategori,
-            hargaPerKg: kategori.hargaPerKg,
-            poinPerKg: kategori.poinPerKg,
+            namaKategori:
+                kategori.namaKategori,
+            hargaPerKg:
+                kategori.hargaPerKg,
+            poinPerKg:
+                kategori.poinPerKg,
             jenis: kategori.jenis,
             foto: kategori.foto,
         };
@@ -167,7 +227,9 @@ export class KategoriSampahService {
 
     async remove(id: string) {
         if (!this.isValidUuid(id)) {
-            throw new NotFoundException('data tidak ada');
+            throw new NotFoundException(
+                'data tidak ada',
+            );
         }
 
         const existing =
@@ -178,7 +240,9 @@ export class KategoriSampahService {
             });
 
         if (!existing) {
-            throw new NotFoundException('data tidak ada');
+            throw new NotFoundException(
+                'data tidak ada',
+            );
         }
 
         await this.prisma.kategoriSampah.delete({

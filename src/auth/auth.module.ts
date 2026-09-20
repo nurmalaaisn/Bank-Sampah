@@ -8,10 +8,13 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
+import { CloudinaryModule } from '../common/cloudinary/cloudinary.module';
+
 @Module({
     imports: [
         ConfigModule,
         PassportModule,
+        CloudinaryModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
@@ -19,8 +22,9 @@ import { JwtStrategy } from './strategies/jwt.strategy';
                 secret: configService.get<string>('JWT_SECRET'),
                 signOptions: {
                     expiresIn:
-                        (configService.get<string>('JWT_EXPIRES_IN') as StringValue) ||
-                        '1d',
+                        (configService.get<string>(
+                            'JWT_EXPIRES_IN',
+                        ) as StringValue) || '1d',
                 },
             }),
         }),
@@ -32,4 +36,4 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     ],
     exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

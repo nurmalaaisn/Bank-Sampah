@@ -22,7 +22,6 @@ import {
 } from '@nestjs/swagger';
 
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 
 import { HadiahService } from './hadiah.service';
 import { CreateHadiahDto } from './dto/create-hadiah.dto';
@@ -38,7 +37,7 @@ import { ResponseMessage } from '../common/decorators/response-message.decorator
 export class HadiahController {
     constructor(
         private readonly hadiahService: HadiahService,
-    ) { }
+    ) {}
 
     @Get()
     @ApiOperation({
@@ -66,11 +65,13 @@ export class HadiahController {
     })
     @ApiResponse({
         status: 200,
-        description: 'Detail hadiah berhasil diambil',
+        description:
+            'Detail hadiah berhasil diambil',
     })
     @ApiResponse({
         status: 404,
-        description: 'Data hadiah tidak ditemukan',
+        description:
+            'Data hadiah tidak ditemukan',
     })
     @ResponseMessage(
         'Detail hadiah berhasil diambil',
@@ -93,7 +94,8 @@ export class HadiahController {
             properties: {
                 namaHadiah: {
                     type: 'string',
-                    example: 'Voucher Belanja Rp50.000',
+                    example:
+                        'Voucher Belanja Rp50.000',
                 },
                 poinDibutuhkan: {
                     type: 'integer',
@@ -106,29 +108,35 @@ export class HadiahController {
                 foto: {
                     type: 'string',
                     format: 'binary',
-                    description: 'Foto hadiah',
+                    description:
+                        'Foto hadiah yang akan disimpan di Cloudinary',
                 },
             },
         },
     })
     @ApiOperation({
-        summary: 'Menambahkan hadiah baru (Admin)',
+        summary:
+            'Menambahkan hadiah baru (Admin)',
     })
     @ApiResponse({
         status: 201,
-        description: 'Hadiah baru berhasil ditambahkan',
+        description:
+            'Hadiah baru berhasil ditambahkan',
     })
     @ApiResponse({
         status: 400,
-        description: 'Data tidak valid / data sudah ada',
+        description:
+            'Data tidak valid / data sudah ada',
     })
     @ApiResponse({
         status: 401,
-        description: 'Token tidak valid atau tidak ada',
+        description:
+            'Token tidak valid atau tidak ada',
     })
     @ApiResponse({
         status: 403,
-        description: 'Akses hanya untuk admin bank',
+        description:
+            'Akses hanya untuk admin bank',
     })
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin_bank')
@@ -136,11 +144,7 @@ export class HadiahController {
         'Hadiah baru berhasil ditambahkan',
     )
     @UseInterceptors(
-        FileInterceptor('foto', {
-            storage: diskStorage({
-                destination: './uploads',
-            }),
-        }),
+        FileInterceptor('foto'),
     )
     create(
         @Body() dto: CreateHadiahDto,
@@ -149,7 +153,7 @@ export class HadiahController {
     ) {
         return this.hadiahService.create(
             dto,
-            file?.filename,
+            file,
         );
     }
 
@@ -167,7 +171,8 @@ export class HadiahController {
             properties: {
                 namaHadiah: {
                     type: 'string',
-                    example: 'Voucher Belanja Rp50.000',
+                    example:
+                        'Voucher Belanja Rp50.000',
                 },
                 poinDibutuhkan: {
                     type: 'integer',
@@ -180,13 +185,15 @@ export class HadiahController {
                 foto: {
                     type: 'string',
                     format: 'binary',
-                    description: 'Foto hadiah',
+                    description:
+                        'Foto hadiah baru yang akan disimpan di Cloudinary',
                 },
             },
         },
     })
     @ApiOperation({
-        summary: 'Memperbarui hadiah (Admin)',
+        summary:
+            'Memperbarui hadiah (Admin)',
     })
     @ApiParam({
         name: 'id',
@@ -194,23 +201,28 @@ export class HadiahController {
     })
     @ApiResponse({
         status: 200,
-        description: 'Data hadiah berhasil diperbarui',
+        description:
+            'Data hadiah berhasil diperbarui',
     })
     @ApiResponse({
         status: 400,
-        description: 'Data tidak valid',
+        description:
+            'Data tidak valid',
     })
     @ApiResponse({
         status: 401,
-        description: 'Token tidak valid atau tidak ada',
+        description:
+            'Token tidak valid atau tidak ada',
     })
     @ApiResponse({
         status: 403,
-        description: 'Akses hanya untuk admin bank',
+        description:
+            'Akses hanya untuk admin bank',
     })
     @ApiResponse({
         status: 404,
-        description: 'Data hadiah tidak ditemukan',
+        description:
+            'Data hadiah tidak ditemukan',
     })
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin_bank')
@@ -218,11 +230,7 @@ export class HadiahController {
         'Data hadiah berhasil diperbarui',
     )
     @UseInterceptors(
-        FileInterceptor('foto', {
-            storage: diskStorage({
-                destination: './uploads',
-            }),
-        }),
+        FileInterceptor('foto'),
     )
     update(
         @Param('id') id: string,
@@ -233,14 +241,15 @@ export class HadiahController {
         return this.hadiahService.update(
             id,
             dto,
-            file?.filename,
+            file,
         );
     }
 
     @Delete(':id')
     @ApiBearerAuth('access-token')
     @ApiOperation({
-        summary: 'Menghapus hadiah (Admin)',
+        summary:
+            'Menghapus hadiah (Admin)',
     })
     @ApiParam({
         name: 'id',
@@ -248,19 +257,23 @@ export class HadiahController {
     })
     @ApiResponse({
         status: 200,
-        description: 'Hadiah berhasil dihapus',
+        description:
+            'Hadiah berhasil dihapus',
     })
     @ApiResponse({
         status: 401,
-        description: 'Token tidak valid atau tidak ada',
+        description:
+            'Token tidak valid atau tidak ada',
     })
     @ApiResponse({
         status: 403,
-        description: 'Akses hanya untuk admin bank',
+        description:
+            'Akses hanya untuk admin bank',
     })
     @ApiResponse({
         status: 404,
-        description: 'Data hadiah tidak ditemukan',
+        description:
+            'Data hadiah tidak ditemukan',
     })
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin_bank')

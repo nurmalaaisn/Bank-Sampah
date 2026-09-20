@@ -3,7 +3,12 @@ import { Module } from '@nestjs/common';
 import { HadiahController } from './hadiah.controller';
 import { HadiahService } from './hadiah.service';
 
+import { CloudinaryModule } from '../common/cloudinary/cloudinary.module';
+
 @Module({
+    imports: [
+        CloudinaryModule,
+    ],
     controllers: [
         HadiahController,
     ],
@@ -11,4 +16,4 @@ import { HadiahService } from './hadiah.service';
         HadiahService,
     ],
 })
-export class HadiahModule { }
+export class HadiahModule {}

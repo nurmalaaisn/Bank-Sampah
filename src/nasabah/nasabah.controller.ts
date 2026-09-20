@@ -22,7 +22,6 @@ import {
 } from '@nestjs/swagger';
 
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 
 import { NasabahService } from './nasabah.service';
 import { CreateNasabahDto } from './dto/create-nasabah.dto';
@@ -49,15 +48,18 @@ export class NasabahController {
     })
     @ApiResponse({
         status: 200,
-        description: 'Daftar nasabah berhasil diambil',
+        description:
+            'Daftar nasabah berhasil diambil',
     })
     @ApiResponse({
         status: 401,
-        description: 'Token tidak valid atau tidak ada',
+        description:
+            'Token tidak valid atau tidak ada',
     })
     @ApiResponse({
         status: 403,
-        description: 'Akses hanya untuk admin bank',
+        description:
+            'Akses hanya untuk admin bank',
     })
     @ResponseMessage(
         'Daftar nasabah berhasil diambil',
@@ -93,7 +95,8 @@ export class NasabahController {
                 },
                 alamat: {
                     type: 'string',
-                    example: 'Jl. Kenanga No. 5, Malang',
+                    example:
+                        'Jl. Kenanga No. 5, Malang',
                 },
                 telp: {
                     type: 'string',
@@ -102,28 +105,28 @@ export class NasabahController {
                 foto: {
                     type: 'string',
                     format: 'binary',
-                    description: 'Foto nasabah',
+                    description:
+                        'Foto nasabah yang akan disimpan di Cloudinary',
                 },
             },
         },
     })
     @ApiOperation({
-        summary: 'Menambahkan nasabah baru',
+        summary:
+            'Menambahkan nasabah baru',
     })
     @ApiResponse({
         status: 201,
-        description: 'Nasabah baru berhasil ditambahkan',
+        description:
+            'Nasabah baru berhasil ditambahkan',
     })
     @ApiResponse({
         status: 400,
-        description: 'Data tidak valid / username sudah digunakan',
+        description:
+            'Data tidak valid / username sudah digunakan',
     })
     @UseInterceptors(
-        FileInterceptor('foto', {
-            storage: diskStorage({
-                destination: './uploads',
-            }),
-        }),
+        FileInterceptor('foto'),
     )
     @ResponseMessage(
         'Nasabah baru berhasil ditambahkan',
@@ -135,13 +138,14 @@ export class NasabahController {
     ) {
         return this.nasabahService.create(
             dto,
-            file?.filename,
+            file,
         );
     }
 
     @Get(':id')
     @ApiOperation({
-        summary: 'Melihat detail nasabah',
+        summary:
+            'Melihat detail nasabah',
     })
     @ApiParam({
         name: 'id',
@@ -149,16 +153,20 @@ export class NasabahController {
     })
     @ApiResponse({
         status: 200,
-        description: 'Detail nasabah berhasil diambil',
+        description:
+            'Detail nasabah berhasil diambil',
     })
     @ApiResponse({
         status: 404,
-        description: 'Nasabah tidak ditemukan',
+        description:
+            'Nasabah tidak ditemukan',
     })
     @ResponseMessage(
         'Detail nasabah berhasil diambil',
     )
-    findOne(@Param('id') id: string) {
+    findOne(
+        @Param('id') id: string,
+    ) {
         return this.nasabahService.findOne(id);
     }
 
@@ -179,7 +187,8 @@ export class NasabahController {
                 },
                 alamat: {
                     type: 'string',
-                    example: 'Jl. Kenanga No. 5, Malang',
+                    example:
+                        'Jl. Kenanga No. 5, Malang',
                 },
                 telp: {
                     type: 'string',
@@ -188,13 +197,15 @@ export class NasabahController {
                 foto: {
                     type: 'string',
                     format: 'binary',
-                    description: 'Foto nasabah baru',
+                    description:
+                        'Foto nasabah baru yang akan disimpan di Cloudinary',
                 },
             },
         },
     })
     @ApiOperation({
-        summary: 'Memperbarui data nasabah',
+        summary:
+            'Memperbarui data nasabah',
     })
     @ApiParam({
         name: 'id',
@@ -202,18 +213,16 @@ export class NasabahController {
     })
     @ApiResponse({
         status: 200,
-        description: 'Data nasabah berhasil diperbarui',
+        description:
+            'Data nasabah berhasil diperbarui',
     })
     @ApiResponse({
         status: 404,
-        description: 'Nasabah tidak ditemukan',
+        description:
+            'Nasabah tidak ditemukan',
     })
     @UseInterceptors(
-        FileInterceptor('foto', {
-            storage: diskStorage({
-                destination: './uploads',
-            }),
-        }),
+        FileInterceptor('foto'),
     )
     @ResponseMessage(
         'Data nasabah berhasil diperbarui',
@@ -227,13 +236,14 @@ export class NasabahController {
         return this.nasabahService.update(
             id,
             dto,
-            file?.filename,
+            file,
         );
     }
 
     @Delete(':id')
     @ApiOperation({
-        summary: 'Menghapus data nasabah',
+        summary:
+            'Menghapus data nasabah',
     })
     @ApiParam({
         name: 'id',
@@ -241,16 +251,20 @@ export class NasabahController {
     })
     @ApiResponse({
         status: 200,
-        description: 'Data nasabah berhasil dihapus',
+        description:
+            'Data nasabah berhasil dihapus',
     })
     @ApiResponse({
         status: 404,
-        description: 'Nasabah tidak ditemukan',
+        description:
+            'Nasabah tidak ditemukan',
     })
     @ResponseMessage(
         'Data nasabah berhasil dihapus',
     )
-    remove(@Param('id') id: string) {
+    remove(
+        @Param('id') id: string,
+    ) {
         return this.nasabahService.remove(id);
     }
 }
