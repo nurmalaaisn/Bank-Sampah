@@ -31,13 +31,14 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { imageUploadOptions } from '../common/multer/image-upload.config';
 
 @ApiTags('Kategori Sampah')
 @Controller('kategori-sampah')
 export class KategoriSampahController {
     constructor(
         private readonly kategoriSampahService: KategoriSampahService,
-    ) {}
+    ) { }
 
     @Get()
     @ApiOperation({
@@ -149,7 +150,7 @@ export class KategoriSampahController {
         'Kategori sampah baru berhasil disimpan',
     )
     @UseInterceptors(
-        FileInterceptor('foto'),
+        FileInterceptor('foto', imageUploadOptions),
     )
     create(
         @Body() dto: CreateKategoriSampahDto,
@@ -236,7 +237,7 @@ export class KategoriSampahController {
         'Kategori sampah berhasil diperbarui',
     )
     @UseInterceptors(
-        FileInterceptor('foto'),
+        FileInterceptor('foto', imageUploadOptions),
     )
     update(
         @Param('id') id: string,

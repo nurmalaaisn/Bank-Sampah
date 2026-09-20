@@ -31,13 +31,14 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { imageUploadOptions } from '../common/multer/image-upload.config';
 
 @ApiTags('Hadiah')
 @Controller('hadiah')
 export class HadiahController {
     constructor(
         private readonly hadiahService: HadiahService,
-    ) {}
+    ) { }
 
     @Get()
     @ApiOperation({
@@ -144,7 +145,7 @@ export class HadiahController {
         'Hadiah baru berhasil ditambahkan',
     )
     @UseInterceptors(
-        FileInterceptor('foto'),
+        FileInterceptor('foto', imageUploadOptions),
     )
     create(
         @Body() dto: CreateHadiahDto,
@@ -230,7 +231,7 @@ export class HadiahController {
         'Data hadiah berhasil diperbarui',
     )
     @UseInterceptors(
-        FileInterceptor('foto'),
+        FileInterceptor('foto', imageUploadOptions),
     )
     update(
         @Param('id') id: string,

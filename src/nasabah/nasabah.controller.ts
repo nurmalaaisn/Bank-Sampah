@@ -31,6 +31,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { imageUploadOptions } from '../common/multer/image-upload.config';
 
 @ApiTags('Admin Nasabah')
 @ApiBearerAuth('access-token')
@@ -126,7 +127,7 @@ export class NasabahController {
             'Data tidak valid / username sudah digunakan',
     })
     @UseInterceptors(
-        FileInterceptor('foto'),
+        FileInterceptor('foto', imageUploadOptions),
     )
     @ResponseMessage(
         'Nasabah baru berhasil ditambahkan',
@@ -222,7 +223,7 @@ export class NasabahController {
             'Nasabah tidak ditemukan',
     })
     @UseInterceptors(
-        FileInterceptor('foto'),
+        FileInterceptor('foto', imageUploadOptions),
     )
     @ResponseMessage(
         'Data nasabah berhasil diperbarui',

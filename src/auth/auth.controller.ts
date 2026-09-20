@@ -28,6 +28,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { LoginResponseInterceptor } from '../common/interceptors/login-response.interceptor';
+import { imageUploadOptions } from '../common/multer/image-upload.config';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -96,7 +97,7 @@ export class AuthController {
         'Registrasi nasabah berhasil',
     )
     @UseInterceptors(
-        FileInterceptor('foto'),
+        FileInterceptor('foto', imageUploadOptions),
     )
     registerNasabah(
         @Body() dto: RegisterNasabahDto,
